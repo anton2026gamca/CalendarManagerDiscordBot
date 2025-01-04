@@ -1,1 +1,1 @@
-# CalendarManagerDiscordBot
+# Calendar Manager - a discord bot
