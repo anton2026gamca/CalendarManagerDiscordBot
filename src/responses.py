@@ -12,7 +12,6 @@ def event_list_embed(server_id: int, user_id: int, user_roles: discord.Role) -> 
     )
     num_events: int = 0
     if calendars.get(str(server_id)) is not None:
-        embed.add_field(name="ㅤ ㅤ ㅤ ㅤ<<<ㅤ ***This week*** ㅤ>>>ㅤ ㅤ ㅤ ㅤ", value="")
         for event in calendars[str(server_id)].get("events", []):
             type: str = event["type"]
             name: str = event["name"]
