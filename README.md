@@ -1,5 +1,7 @@
 # Calendar Manager - a discord bot
 
+This is a calendar manager discord bot made for your class discord server!
+
 Join [this discord server](https://discord.gg/grmSf58G) to try me out!
 
 ### How to install
