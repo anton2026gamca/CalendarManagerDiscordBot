@@ -2,7 +2,7 @@
 
 This is a calendar manager discord bot made for your class discord server!
 
-![Screenshot 2025-01-04 100617](https://github.com/user-attachments/assets/8612dbba-f356-4448-81dd-a3a5a86d1ae7)
+![Screenshot 2025-01-04 114814](https://github.com/user-attachments/assets/0111bece-daad-4bb5-83fb-00cde16dd67a)
 
 Join [this discord server](https://discord.gg/grmSf58G) to try me out!
 
