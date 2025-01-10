@@ -97,6 +97,9 @@ class EventGroup(discord.app_commands.Group):
             description = ""
         if (year == None):
             year = datetime.date.today().year
+        if not is_date_valid(day, month, year):
+            await interaction.response.send_message(embed=ivalid_date(day, month, year), ephemeral=True)
+            return
         if not subject_exists(server_id, subject):
             await interaction.response.send_message(embed=event_add_subjectnotvalid(server_id, interaction.user.roles, subject, subjects), ephemeral=True)
             return
@@ -132,6 +135,18 @@ class EventGroup(discord.app_commands.Group):
         await channel.send(embed=event_list_embed(server_id, user_id, interaction.user.roles), view=view)
         await interaction.response.send_message("Oh no ... you should not see this", ephemeral=True)
         await interaction.delete_original_response()
+    
+    @discord.app_commands.command(name="on_date", description="List out all commands on a specific date")
+    @discord.app_commands.describe(month="Defaults to the current month", year="Defaults to the current year")
+    async def event_on_date(self, interaction: discord.Interaction, day: int, month: int | None, year: int | None):
+        if (month == None):
+            month = datetime.date.today().month
+        if (year == None):
+            year = datetime.date.today().year
+        if (is_date_valid(day, month, year)):
+            await interaction.response.send_message(embed=event_on_date(interaction.guild_id, interaction.user.roles, day, month, year), ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=ivalid_date(day, month, year), ephemeral=True)
 
     @discord.app_commands.command(name="info", description="Get more info about an event")
     @discord.app_commands.describe(event_id="The ID of the event to get info of")

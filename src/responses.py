@@ -28,8 +28,6 @@ def event_list_embed(server_id: int, user_id: int, user_roles: discord.Role) -> 
                         for role in user_roles:
                             if role.id == s["role_id"]:
                                 visible = True
-            else:
-                subject[f"{server_id}"] = {"subjects": []}
             if (visible):
                 embed.add_field(name="", value=f":white_small_square: **{subject}** - **{type}** - {name}\nㅤㅤ`{date}`ㅤ(id: `{id}`)`", inline=False)
                 num_events += 1
@@ -37,6 +35,50 @@ def event_list_embed(server_id: int, user_id: int, user_roles: discord.Role) -> 
         embed.add_field(name="", value="You dont have any events", inline=False)
     else:
         embed.add_field(name="", value="Use `/event info [event id]` for more info", inline=False)
+    return embed
+
+def event_on_date(server_id: int, user_roles: discord.Role, day: int, month: int, year: int) -> discord.Embed:
+    embed = discord.Embed(
+        title=f"Events on {day}.{month}. {year}",
+        color=discord.Color.blue()
+    )
+    num_events: int = 0
+    if calendars.get(str(server_id)) is not None:
+        for event in calendars[str(server_id)].get("events", []):
+            event_type: str = event["type"]
+            event_name: str = event["name"]
+            event_subject: str = event["subject"]
+            event_day: int = event["day"]
+            event_month: int = event["month"]
+            event_year: int = event["year"]
+            event_date: str = f"{event_day}.{event_month}. {event_year}"
+            event_id: int = event["id"]
+            visible = False
+            # Check if subjects role is in user roles 
+            if subjects.get(f"{server_id}", []) is not None:
+                for s in subjects[f"{server_id}"]["subjects"]:
+                    if s["name"] == event_subject:
+                        for role in user_roles:
+                            if role.id == s["role_id"]:
+                                visible = True
+            # Check if event is on date
+            if visible and not (event_day == day and event_month == month and event_year == year):
+                visible = False
+            if (visible):
+                embed.add_field(name="", value=f":white_small_square: **{event_subject}** - **{event_type}** - {event_name}\nㅤㅤ`{event_date}`ㅤ(id: `{event_id}`)`", inline=False)
+                num_events += 1
+    if (num_events == 0):
+        embed.add_field(name="", value="*** *cricket noise* ***", inline=False)
+    else:
+        embed.add_field(name="", value="Use `/event info [event id]` for more info", inline=False)
+    return embed
+
+def ivalid_date(day: int, month: int, year: int) -> discord.Embed:
+    embed = discord.Embed(
+        title=f"Invalid date!",
+        color=discord.Color.red()
+    )
+    embed.add_field(name="", value=f"Date \"{day}.{month}. {year}\" is invalid!", inline=False)
     return embed
 
 def event_add_error(error_message: str) -> discord.Embed:
@@ -161,6 +203,8 @@ def calendar_event_edit(server_id: int, event_index: int, type: str | None, name
         month = calendars[str(server_id)]["events"][event_index]["month"]
     if year is None:
         year = calendars[str(server_id)]["events"][event_index]["year"]
+    if not is_date_valid(day, month, year):
+        return ivalid_date(day, month, year)
     id = calendars[str(server_id)]["events"][event_index]["id"]
     calendars[str(server_id)]["events"][event_index]["type"] = type
     calendars[str(server_id)]["events"][event_index]["name"] = name
