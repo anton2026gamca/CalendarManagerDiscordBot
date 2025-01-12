@@ -6,7 +6,7 @@ This is a calendar manager discord bot made for your class discord server!
 
 Join [this discord server](https://discord.gg/grmSf58G) to try me out!
 
-### How to install
+### How to replicate
 
 1. Create a discord app [here](https://discord.com/developers/applications?new_application=true)
 2. Download the [src](https://github.com/anton2026gamca/CalendarManagerDiscordBot/tree/main/src) folder
