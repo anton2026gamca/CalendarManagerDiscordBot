@@ -95,8 +95,8 @@ def event_add_subjectnotvalid(server_id: int, user_roles: discord.Role, subject:
         color=discord.Color.red()
     )
     embed.add_field(name="", value=f"Subject \"{subject}\" does not exist", inline=False)
-    text: str = get_subjects_text(server_id, user_roles, subjects)
-    embed.add_field(name="", value=text, inline=False)
+    text: str = get_subjects_text(server_id, user_roles, subjects, False)
+    embed.add_field(name="Subjects you can use:", value=text, inline=False)
     return embed
 
 def calendar_event_add(server_id: int, type: str, name: str, description: str, subject: str, day: int, month: int, year: int) -> discord.Embed:
@@ -184,8 +184,8 @@ def event_edit_subjectnotvalid(server_id: int, user_roles: discord.Role, subject
         color=discord.Color.red()
     )
     embed.add_field(name="", value=f"Subject \"{subject}\" does not exist", inline=False)
-    text: str = get_subjects_text(server_id, user_roles, subjects)
-    embed.add_field(name="", value=text, inline=False)
+    text: str = get_subjects_text(server_id, user_roles, subjects, False)
+    embed.add_field(name="Subjects you can use:", value=text, inline=False)
     return embed
 
 def calendar_event_edit(server_id: int, event_index: int, type: str | None, name: str | None, description: str | None, subject: str | None, day: int | None, month: int | None, year: int | None) -> discord.Embed:
@@ -254,7 +254,7 @@ def add_subject_exists(subject: str) -> discord.Embed:
         title="Failed to add subject",
         color=discord.Color.red()
     )
-    embed.add_field(name="", value=f"Subject \"{subject}\" already exists!", inline=True)
+    embed.add_field(name="", value=f"Subject \"{subject}\" already exists!", inline=False)
     return embed
 
 def add_subject_nopermissions() -> discord.Embed:
@@ -262,43 +262,145 @@ def add_subject_nopermissions() -> discord.Embed:
         title="Failed to add subject",
         color=discord.Color.red()
     )
-    embed.add_field(name="", value=f"You MUST be the server owner to do this!", inline=True)
+    embed.add_field(name="", value=f"You MUST be the server owner to do this!", inline=False)
     return embed
 
-def add_subject_success(subject: str, role: discord.Role) -> discord.Embed:
+def add_subject_success(subject: str, role: discord.Role, channel: discord.TextChannel | None) -> discord.Embed:
     embed = discord.Embed(
         title="Added Subject Successfully",
         color=discord.Color.green()
     )
-    embed.add_field(name="", value=f"Subject: {subject}\nRole: {role.mention}", inline=True)
+    embed.add_field(name="", value=f"Subject: {subject}", inline=False)
+    embed.add_field(name="", value=f"Role: {role.mention}", inline=False)
+    if channel is not None:
+        embed.add_field(name="", value=f"Channel: {channel.mention}", inline=False)
+    return embed
+
+def edit_subject_nopermissions() -> discord.Embed:
+    embed = discord.Embed(
+        title="Failed to edit subject",
+        color=discord.Color.red()
+    )
+    embed.add_field(name="", value=f"You MUST be the server owner to do this!", inline=False)
+    return embed
+
+def edit_subject_doesnotexist(subject_name: str) -> discord.Embed:
+    embed = discord.Embed(
+        title="Failed to edit subject",
+        color=discord.Color.red()
+    )
+    embed.add_field(name="", value=f"Subject with name \"{subject_name}\" does not exist!", inline=False)
+    return embed
+
+def edit_subject_success(old_name: str, new_name: str, old_role_id: int, new_role_id: int, old_channel_id: int, new_channel_id: int) -> discord.Embed:
+    embed = discord.Embed(
+        title="Changed Subject Successfully",
+        color=discord.Color.green()
+    )
+    changes: int = 0
+    if (new_name != old_name):
+        embed.add_field(name="", value=f"Name: \"{old_name}\" -> \"{new_name}\"", inline=False)
+        changes += 1
+    if (new_role_id != old_role_id):
+        embed.add_field(name="", value=f"Role: <@&{old_role_id}> -> <@&{new_role_id}>", inline=False)
+        changes += 1
+    if (new_channel_id != old_channel_id and (new_channel_id >= 0 or old_channel_id >= 0)):
+        new_channel: str = f"<#{new_channel_id}>" if new_channel_id >= 0 else "None"
+        old_channel: str = f"<#{old_channel_id}>" if old_channel_id >= 0 else "None"
+        embed.add_field(name="", value=f"Channel: {old_channel} -> {new_channel}", inline=False)
+        changes += 1
+    if (changes <= 0):
+        embed.add_field(name="", value=f"There were no changes made to the subject", inline=False)
+    return embed
+
+def remove_subject_nopermissions() -> discord.Embed:
+    embed = discord.Embed(
+        title="Failed to remove subject",
+        color=discord.Color.red()
+    )
+    embed.add_field(name="", value=f"You MUST be the server owner to do this!", inline=False)
+    return embed
+
+def remove_subject_doesnotexist(subject_name: str) -> discord.Embed:
+    embed = discord.Embed(
+        title="Failed to remove subject",
+        color=discord.Color.red()
+    )
+    embed.add_field(name="", value=f"Subject with name \"{subject_name}\" does not exist!", inline=False)
+    return embed
+
+def remove_subject_success(subject_name: str) -> discord.Embed:
+    embed = discord.Embed(
+        title="Remove Subject Successfully",
+        color=discord.Color.green()
+    )
+    embed.add_field(name="", value=f"Name: \"{subject_name}\"", inline=False)
     return embed
 
 def get_subjects_embed(server_id: int, user_roles: discord.Role, subjects) -> discord.Embed:
     embed = discord.Embed(
         title="",
-        color=discord.Color.red()
+        color=discord.Color.blue()
     )
-    text = get_subjects_text(server_id, user_roles, subjects)
-    embed.add_field(name="", value=text, inline=False)
+    text = get_subjects_text(server_id, user_roles, subjects, False)
+    embed.add_field(name="Subjects you can use:", value=text, inline=False)
     return embed
 
-def get_subjects_text(server_id: int, user_roles: discord.Role, subjects) -> str:
-    text: str = "Subjects you can use:\n"
+def get_all_subjects_embed(server_id: int, user_roles: discord.Role | None, subjects) -> discord.Embed:
+    embed = discord.Embed(
+        title="",
+        color=discord.Color.blue()
+    )
+    text = get_subjects_text(server_id, user_roles, subjects, True)
+    embed.add_field(name="All subjects:", value=text, inline=False)
+    return embed
+
+def get_subjects_text(server_id: int, user_roles: discord.Role | None, subjects, print_all: bool) -> str:
+    text: str = ""
     num_subjects: int = 0
     if subjects.get(str(server_id)) is not None:
         user_roles_id = []
-        for role in user_roles:
-            user_roles_id.append(role.id)
+        if user_roles is not None:
+            for role in user_roles:
+                user_roles_id.append(role.id)
+        i: int = 0
         for subj in subjects[str(server_id)]["subjects"]:
-            if user_roles_id.__contains__(subj["role_id"]):
+            can_use: bool = user_roles_id.__contains__(subj["role_id"])
+            if print_all or can_use:
+                emoji: str = ":white_small_square:" if subj.get("channel") is not None and subj["channel"] > -1 else ":small_blue_diamond:"
+                id: str = f"({i})" if print_all else ""
                 name: str = subj["name"]
-                text += f":white_small_square:{name}\n"
+                text += f"{emoji} {id} {name}\n"
                 num_subjects += 1
+            i += 1
     if (num_subjects == 0):
         text = "There are no subjects"
     return text
 
-def settings_set_adminrole_nopermissions():
+def get_subject_info_not_found(id: int):
+    embed = discord.Embed(
+        title="Subject Not Found",
+        color=discord.Color.red()
+    )
+    embed.add_field(name="", value=f"Couldn't find a subject with id \"{id}\"", inline=False)
+    return embed
+
+def get_subject_info(subject):
+    embed = discord.Embed(
+        title="Get Subject Info",
+        color=discord.Color.blue()
+    )
+    text: str = ""
+    role_id = subject["role_id"]
+    text += f"Role: <@&{role_id}>"
+    if "channel" in subject:
+        channel = subject["channel"]
+        text += f"\nChannel: <#{channel}>"
+    name = subject["name"]
+    embed.add_field(name=f"Subject: {name}", value=text, inline=False)
+    return embed
+
+def set_adminrole_nopermissions():
     embed = discord.Embed(
         title="Unable to set admin role",
         color=discord.Color.red()
@@ -306,7 +408,7 @@ def settings_set_adminrole_nopermissions():
     embed.add_field(name="", value=f"You don't have permissions to do this!", inline=False)
     return embed
 
-def settings_set_adminrole_success(role: discord.Role):
+def set_adminrole_success(role: discord.Role):
     embed = discord.Embed(
         title="Set Admin Role",
         color=discord.Color.green()
@@ -314,7 +416,7 @@ def settings_set_adminrole_success(role: discord.Role):
     embed.add_field(name="", value=f"Set admin role successfully to {role.mention}", inline=False)
     return embed
 
-def settings_set_trustedrole_nopermissions():
+def set_trustedrole_nopermissions():
     embed = discord.Embed(
         title="Unable to set trusted role",
         color=discord.Color.red()
@@ -322,7 +424,7 @@ def settings_set_trustedrole_nopermissions():
     embed.add_field(name="", value=f"You don't have permissions to do this!", inline=False)
     return embed
 
-def settings_set_trustedrole_success(role: discord.Role):
+def set_trustedrole_success(role: discord.Role):
     embed = discord.Embed(
         title="Set Trusted Role",
         color=discord.Color.green()
@@ -330,27 +432,84 @@ def settings_set_trustedrole_success(role: discord.Role):
     embed.add_field(name="", value=f"Set trusted role successfully to {role.mention}", inline=False)
     return embed
 
+def set_helpchannel_nopermissions():
+    embed = discord.Embed(
+        title="Unable to set help channel",
+        color=discord.Color.red()
+    )
+    embed.add_field(name="", value=f"You don't have permissions to do this!", inline=False)
+    return embed
+
+def set_helpchannel_success(channel: discord.TextChannel):
+    embed = discord.Embed(
+        title="Set Help Channel",
+        color=discord.Color.green()
+    )
+    embed.add_field(name="", value=f"Set help channel successfully to {channel.mention}", inline=False)
+    return embed
+
+def set_calendarcategory_nopermissions():
+    embed = discord.Embed(
+        title="Unable to set calendar category",
+        color=discord.Color.red()
+    )
+    embed.add_field(name="", value=f"You don't have permissions to do this!", inline=False)
+    return embed
+
+def set_calendarcategory_success(category: discord.CategoryChannel):
+    embed = discord.Embed(
+        title="Set Calendar Category",
+        color=discord.Color.green()
+    )
+    embed.add_field(name="", value=f"Set calendar category successfully to {category.mention}", inline=False)
+    return embed
+
+def get_adminrole(role_id: int | None):
+    embed = discord.Embed(
+        title="Get Admin Role",
+        color=discord.Color.blue()
+    )
+    text: str = f"<@&{role_id}>" if role_id is not None else "not set, set it with `/set admin_role`"
+    embed.add_field(name="", value=f"The admin role is {text}", inline=False)
+    return embed
+
+def get_trustedrole(role_id: int | None):
+    embed = discord.Embed(
+        title="Get Trusted Role",
+        color=discord.Color.blue()
+    )
+    text: str = f"<@&{role_id}>" if role_id is not None else "not set, set it with `/set trusted_role`"
+    embed.add_field(name="", value=f"The trusted role is {text}", inline=False)
+    return embed
+
+def get_helpchannel(channel_id: int | None):
+    embed = discord.Embed(
+        title="Get Help Channel",
+        color=discord.Color.blue()
+    )
+    text: str = f"<#{channel_id}>" if channel_id is not None else "not set, set it with `/set help_channel`"
+    embed.add_field(name="", value=f"The help channel is {text}", inline=False)
+    return embed
+
+def get_calendarcategory(channel_id: int | None):
+    embed = discord.Embed(
+        title="Get Calendar Category",
+        color=discord.Color.blue()
+    )
+    text: str = f"<#{channel_id}>" if channel_id is not None else "not set, set it with `/set calendar_category`"
+    embed.add_field(name="", value=f"The calendar category is {text}", inline=False)
+    return embed
+
+def problem_resolved(user_mention: str) -> discord.Embed:
+    embed = discord.Embed(
+        title="",
+        color=discord.Color.blue()
+    )
+    embed.add_field(name="", value=f"This problem was marked as resolved by {user_mention}", inline=False)
+    return embed
+
 def get_response(user_input: str) -> str:
-    if not (user_input[0] == "!"):
+    if not user_input[0] == "!":
         return ""
     user_input = user_input[1:]
-    if (user_input == "roll a dice"):
-        return f"You've rolled {randint(1, 6)}"
     return ""
-
-def get_embed(user_input: str) -> discord.Embed:
-    if not (user_input[0] == "!"):
-        return None
-    user_input = user_input[1:]
-    if (user_input == "example embed"):
-        embed = discord.Embed(
-            title="Example Embed",
-            description="This is a simple embed message.",
-            color=discord.Color.blue()
-        )
-        embed.add_field(name="Field 1", value="This is the first field", inline=False)
-        embed.add_field(name="Field 2", value="This is the second field", inline=True)
-        embed.set_footer(text="This is a footer")
-
-        return embed
-    return None
