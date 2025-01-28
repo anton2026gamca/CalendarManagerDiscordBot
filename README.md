@@ -6,7 +6,7 @@ This is a calendar manager discord bot made for your class discord server!
 
 Join [this discord server](https://discord.gg/grmSf58G) to try me out!
 
-### These are the common commands:
+### These are some common commands:
 
 ![image](https://github.com/user-attachments/assets/2a9d5c45-8bc8-45bb-aaec-1ffda37ab437)
 
