@@ -12,3 +12,5 @@ Join [this discord server](https://discord.gg/grmSf58G) to try me out!
 2. Download the [src](https://github.com/anton2026gamca/CalendarManagerDiscordBot/tree/main/src) folder
 3. Change "[Your discord bot token here]" in the .env file to your token
 4. Run the main.py
+
+![image](https://github.com/user-attachments/assets/2eddf6a9-9690-446b-84aa-8f8765e407f6)
