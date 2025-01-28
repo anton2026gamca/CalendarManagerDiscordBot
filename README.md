@@ -20,7 +20,7 @@ Then, when the question is resolved, an admin can type `!resolved` to mark it as
 
 ## How to replicate
 
-1. Create a discord app [here](https://discord.com/developers/applications?new_application=true)
+1. Create a discord app [here](https://discord.com/developers/applications?new_application=true) (more detail [here](https://discordpy.readthedocs.io/en/stable/discord.html))
 2. Download the [src](https://github.com/anton2026gamca/CalendarManagerDiscordBot/tree/main/src) folder
 3. Change "[Your discord bot token here]" in the .env file to your token
 4. Run the main.py
