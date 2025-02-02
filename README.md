@@ -1,5 +1,7 @@
 # Calendar Manager - a discord bot
 
+I made this project, because i wanted to have the school things organised and me and my friends thought this will be a great idea.
+
 This is a calendar manager discord bot made for your class discord server!
 
 ![Screenshot 2025-01-04 114814](https://github.com/user-attachments/assets/0111bece-daad-4bb5-83fb-00cde16dd67a)
